@@ -1,7 +1,17 @@
 package vn.edu.hust.studentman
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.ContextMenu
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.ListView
+import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -10,9 +20,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class MainActivity : AppCompatActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
 
     val students = mutableListOf(
       StudentModel("Nguyễn Văn An", "SV001"),
@@ -37,11 +44,108 @@ class MainActivity : AppCompatActivity() {
       StudentModel("Lê Văn Vũ", "SV020")
     )
 
-    val studentAdapter = StudentAdapter(students)
 
-    findViewById<RecyclerView>(R.id.recycler_view_students).run {
-      adapter = studentAdapter
-      layoutManager = LinearLayoutManager(this@MainActivity)
+  private lateinit var studentAdapter: StudentAdapter
+  private lateinit var listView: ListView
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_main)
+
+    // Thiết lập toolbar
+    val toolbar: Toolbar = findViewById(R.id.toolbar)
+    setSupportActionBar(toolbar)
+
+    // Thiết lập ListView
+    listView = findViewById(R.id.list_view_students)
+    studentAdapter = StudentAdapter(this, students)
+    listView.adapter = studentAdapter
+
+    // Đăng ký context menu cho ListView
+    registerForContextMenu(listView)
+  }
+
+  // Tạo OptionMenu
+  override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    menuInflater.inflate(R.menu.main_menu, menu)
+    return true
+  }
+
+  // Xử lý khi chọn mục trong OptionMenu
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    return when (item.itemId) {
+      R.id.menu_add -> {
+        // Mở Activity để thêm sinh viên mới
+        val intent = Intent(this, AddStudentActivity::class.java)
+        startActivityForResult(intent, REQUEST_ADD_STUDENT)
+        true
+      }
+      else -> super.onOptionsItemSelected(item)
     }
+  }
+
+  // Tạo ContextMenu cho từng mục trong ListView
+  override fun onCreateContextMenu(
+    menu: ContextMenu?,
+    v: View?,
+    menuInfo: ContextMenu.ContextMenuInfo?
+  ) {
+    super.onCreateContextMenu(menu, v, menuInfo)
+    menuInflater.inflate(R.menu.context_menu, menu)
+  }
+
+  // Xử lý khi chọn mục trong ContextMenu
+  override fun onContextItemSelected(item: MenuItem): Boolean {
+    val info = item.menuInfo as AdapterView.AdapterContextMenuInfo
+    val selectedStudent = students[info.position]
+
+    return when (item.itemId) {
+      R.id.menu_edit -> {
+        // Mở Activity để chỉnh sửa sinh viên
+        val intent = Intent(this, EditStudentActivity::class.java)
+        intent.putExtra("studentName", selectedStudent.studentName)
+        intent.putExtra("studentId", selectedStudent.studentId)
+        intent.putExtra("position", info.position)
+        startActivityForResult(intent, REQUEST_EDIT_STUDENT)
+        true
+      }
+      R.id.menu_remove -> {
+        // Xóa sinh viên khỏi danh sách
+        students.removeAt(info.position)
+        studentAdapter.notifyDataSetChanged()
+        Toast.makeText(this, "Đã xóa sinh viên", Toast.LENGTH_SHORT).show()
+        true
+      }
+      else -> super.onContextItemSelected(item)
+    }
+  }
+
+  // Xử lý kết quả trả về từ các Activity
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+    if (resultCode == RESULT_OK && data != null) {
+      when (requestCode) {
+        REQUEST_ADD_STUDENT -> {
+          val name = data.getStringExtra("studentName") ?: ""
+          val id = data.getStringExtra("studentId") ?: ""
+          students.add(StudentModel(name, id))
+          studentAdapter.notifyDataSetChanged()
+        }
+        REQUEST_EDIT_STUDENT -> {
+          val name = data.getStringExtra("studentName") ?: ""
+          val id = data.getStringExtra("studentId") ?: ""
+          val position = data.getIntExtra("position", -1)
+          if (position != -1) {
+            students[position] = StudentModel(name, id)
+            studentAdapter.notifyDataSetChanged()
+          }
+        }
+      }
+    }
+  }
+
+  companion object {
+    const val REQUEST_ADD_STUDENT = 1
+    const val REQUEST_EDIT_STUDENT = 2
   }
 }
