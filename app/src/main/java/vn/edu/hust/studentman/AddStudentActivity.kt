@@ -1,5 +1,7 @@
 package vn.edu.hust.studentman
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.Button
@@ -23,8 +25,10 @@ class AddStudentActivity : AppCompatActivity() {
             val name = studentNameEditText.text.toString()
             val studentId = studentIdEditText.text.toString()
             if (name.isNotEmpty() && studentId.isNotEmpty()) {
-                val newStudent = StudentModel(name, studentId)
-                // You need to add logic to save this new student in the main list
+                val resultIntent = Intent()
+                resultIntent.putExtra("studentName", name)
+                resultIntent.putExtra("studentId", studentId)
+                setResult(Activity.RESULT_OK, resultIntent)
                 finish()
             }
         }

@@ -75,7 +75,6 @@ class MainActivity : AppCompatActivity() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       R.id.menu_add -> {
-        // Mở Activity để thêm sinh viên mới
         val intent = Intent(this, AddStudentActivity::class.java)
         startActivityForResult(intent, REQUEST_ADD_STUDENT)
         true
@@ -101,16 +100,13 @@ class MainActivity : AppCompatActivity() {
 
     return when (item.itemId) {
       R.id.menu_edit -> {
-        // Mở Activity để chỉnh sửa sinh viên
         val intent = Intent(this, EditStudentActivity::class.java)
-        intent.putExtra("studentName", selectedStudent.studentName)
-        intent.putExtra("studentId", selectedStudent.studentId)
+        intent.putExtra("student", selectedStudent)
         intent.putExtra("position", info.position)
         startActivityForResult(intent, REQUEST_EDIT_STUDENT)
         true
       }
       R.id.menu_remove -> {
-        // Xóa sinh viên khỏi danh sách
         students.removeAt(info.position)
         studentAdapter.notifyDataSetChanged()
         Toast.makeText(this, "Đã xóa sinh viên", Toast.LENGTH_SHORT).show()

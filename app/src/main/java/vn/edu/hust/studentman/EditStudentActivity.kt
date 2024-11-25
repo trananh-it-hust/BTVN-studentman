@@ -1,5 +1,7 @@
 package vn.edu.hust.studentman
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.Button
@@ -27,9 +29,11 @@ class EditStudentActivity : AppCompatActivity() {
             val name = studentNameEditText.text.toString()
             val studentId = studentIdEditText.text.toString()
             if (name.isNotEmpty() && studentId.isNotEmpty()) {
-                // Update student info and return
-                student.studentName = name
-                student.studentId = studentId
+                val resultIntent = Intent()
+                resultIntent.putExtra("studentName", name)
+                resultIntent.putExtra("studentId", studentId)
+                resultIntent.putExtra("position", intent.getIntExtra("position", -1))
+                setResult(Activity.RESULT_OK, resultIntent)
                 finish()
             }
         }
