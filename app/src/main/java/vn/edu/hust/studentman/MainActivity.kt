@@ -52,20 +52,16 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
 
-    // Thiết lập toolbar
     val toolbar: Toolbar = findViewById(R.id.toolbar)
     setSupportActionBar(toolbar)
 
-    // Thiết lập ListView
     listView = findViewById(R.id.list_view_students)
     studentAdapter = StudentAdapter(this, students)
     listView.adapter = studentAdapter
 
-    // Đăng ký context menu cho ListView
     registerForContextMenu(listView)
   }
 
-  // Tạo OptionMenu
   override fun onCreateOptionsMenu(menu: Menu?): Boolean {
     menuInflater.inflate(R.menu.main_menu, menu)
     return true
