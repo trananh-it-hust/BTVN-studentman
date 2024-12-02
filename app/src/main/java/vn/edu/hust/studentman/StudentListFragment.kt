@@ -75,40 +75,48 @@ class StudentListFragment : Fragment() {
                 findNavController().navigate(R.id.action_studentListFragment_to_addEditStudentFragment)
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo?) {
-        super.onCreateContextMenu(menu, v, menuInfo)
-        val inflater: MenuInflater = requireActivity().menuInflater
-        inflater.inflate(R.menu.context_menu_student_list, menu)
-    }
+//    show context menu when long click on list item
+override fun onCreateContextMenu(
+    menu: ContextMenu,
+    v: View,
+    menuInfo: ContextMenu.ContextMenuInfo?
+) {
+    super.onCreateContextMenu(menu, v, menuInfo)
+    requireActivity().menuInflater.inflate(R.menu.context_menu_student_list, menu)
+}
 
-    override fun onContextItemSelected(item: MenuItem): Boolean {
-        val info = item.menuInfo as AdapterView.AdapterContextMenuInfo
-        return when (item.itemId) {
-            R.id.action_edit -> {
-                val selectedStudent = students[info.position]
-                val bundle = Bundle().apply {
-                    putSerializable("student", selectedStudent)
-                }
-                findNavController().navigate(R.id.action_studentListFragment_to_addEditStudentFragment, bundle)
-                true
+override fun onContextItemSelected(item: MenuItem): Boolean {
+    val info = item.menuInfo as AdapterView.AdapterContextMenuInfo
+    return when (item.itemId) {
+        R.id.action_edit -> {
+            val selectedStudent = students[info.position]
+            val bundle = Bundle().apply {
+                putSerializable("student", selectedStudent)
             }
-            R.id.action_remove -> {
-                val removedStudent = students.removeAt(info.position)
-                studentAdapter.notifyDataSetChanged()
-
-                // Show Snackbar with undo option
-                Snackbar.make(requireView(), "Đã xóa sinh viên", Snackbar.LENGTH_LONG)
-                    .setAction("Undo") {
-                        students.add(info.position, removedStudent)
-                        studentAdapter.notifyDataSetChanged()
-                    }.show()
-                true
-            }
-            else -> super.onContextItemSelected(item)
+            findNavController().navigate(
+                R.id.action_studentListFragment_to_addEditStudentFragment,
+                bundle
+            )
+            true
         }
+        R.id.action_remove -> {
+            val removedStudent = students.removeAt(info.position)
+            studentAdapter.notifyDataSetChanged()
+
+            // Show Snackbar with undo option
+            Snackbar.make(requireView(), "Đã xóa sinh viên", Snackbar.LENGTH_LONG)
+                .setAction("Undo") {
+                    students.add(info.position, removedStudent)
+                    studentAdapter.notifyDataSetChanged()
+                }.show()
+            true
+        }
+        else -> super.onContextItemSelected(item)
     }
 }
+    }
