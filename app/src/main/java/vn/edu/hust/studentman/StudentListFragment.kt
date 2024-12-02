@@ -43,7 +43,7 @@ class StudentListFragment : Fragment() {
         studentListView = view.findViewById(R.id.list_view_students)
         studentAdapter = StudentAdapter(requireContext(), students)
         studentListView.adapter = studentAdapter
-        registerForContextMenu(studentListView) // Register for context menu
+        registerForContextMenu(studentListView)
         setHasOptionsMenu(true)
 
         findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<StudentModel>("newStudent")
